@@ -1,5 +1,5 @@
-### iCX Media Data Science Task
-##### Samira Kumar Varadharajan
+### <center>iCX Media Data Science Task</center>
+##### <center>Samira Kumar Varadharajan</center>
 
 ##### DATASET:
 
@@ -25,11 +25,10 @@ The 'Class' field refers to the presence of the self-care problems of the childr
 
 ----
 
-#### Contents
+#### CONTENTS
 
 <u>Clustering:</u>
 - [Data cleaning and exploratory analysis:](#EDA)
-
 - Feature Engineering
 - Clustering - Dendrogram (find no of clusters)
     - Hierarchical clustering
@@ -47,6 +46,19 @@ The 'Class' field refers to the presence of the self-care problems of the childr
 
 #### Data cleaning and exploratory analysis:
 
+- Changing the `Gender` variable to `Categorical`
+- `Age` is set to numerical (continuous variable)
+- `Classes` variable is stripped of word 'class' and converted as `Categorical`
+
+```df['Gender'] = pd.Categorical(df['Gender'])
+df['Age'] = pd.to_numeric(df['Age'])
+df['Classes'] = df['Classes'].str.replace('class','')
+df['Classes'] = pd.Categorical(df['Classes'])
+```
+
+<img src="/docs/gender_distribution.png" alt="Soccer Animation" width="700"/>
+
+![Gender Distribution](..docs/gender_distribution.png)
 
 
 
