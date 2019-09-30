@@ -415,8 +415,9 @@ Cluster 3: Equal proportion of children, aged around 8, with proper sanitation i
 #### Classification on features vs target label (cluster)
 
 Since we've the created an unsupervised clusters/groups of children, 
-we can use that as a label to create a classification model which can be used to classify
-future patients.
+we can use that as a label to train a classification model which can be used to classify
+new patients. The cluster labels are now the target labels and the existing features from TSVD 
+are the features. 
 
 We've a good class balance in this scenario. In case we don't have proper class balance, we can use 
 an algorithm's inbuilt class balance penalty or use additional methods like `SMOTE` to impute 
@@ -558,4 +559,13 @@ All of these above methods have been implemented in the [main.py](code/main.py) 
 **<u>Conclusion:</u>** 
 
 Considering the small sample size, the model performs relatively efficient for all 
-target classes. 
+target classes. The precision and recall for all classes are high and overall `micro and 
+macro average` are high as well. 
+
+The clusters also provide a significant information towards the characteristics of the children
+and help us identify the uniqueness of each cluster. The dendrogram shows us which groups of
+children are similar (shows distance between each clusters as well). 
+
+The final saved model (saved from running `main.py`) can be run for new set of data in order 
+to predict their cluster/classes. 
+  
