@@ -516,6 +516,8 @@ how each class is performing on its own. So to get a better picture of the model
 
 <img src="/docs/metrics_classifier.png" alt="Classifier Metrics" width="600"/>
 
+
+
 Looking at the `confusion matrix`, class 1 has 2 errors and class 3 has 1 error. The cost of making
 a mistake could be different in each cluster/class.
 
@@ -543,6 +545,13 @@ can be either `micro` or `macro` and both are approximately `0.95` and `0.99` re
 Overall the improved model (after random search) performs well for all classes considering the ROC 
 and precision/recall outputs.  
 
+Considering the small sample size (70), the model's `cross validation score` is lower than 
+the `training score` but the difference is small. Also the model suffers from variance since there is a high shaded region around
+the cross validation score in below graph. 
+
+
+ <img src="/docs/valid_score.png" alt="Validation Score" width="600"/>
+
 
 ----
 
@@ -550,33 +559,40 @@ and precision/recall outputs.
 
 #### Scaling the model to production
 
-In order to replicate the model in a production environment, few things have to be considered when
-developing the code/process.
+In order to replicate the process in a production environment, few things have to be considered when
+developing the process.
 
 The entire process has to be split into 2 parts - Algorithm/Model related activities vs 
 Non Algorithm/Model activities. This gives the flexibility to update or modify the pipeline 
-based on the type of update and need. 
+based on the type of update and need. Also, it's easy to isolate the issue and fix them and also easy
+to add new updates or modify like model parameters.
+
+
+The outline of the process is sketched below:
+
 
  <img src="/docs/scaling.png" alt="Scaling" width="600"/>
 
 
 
 ```
-The non-algorithm part includes exploratory graphs, processing data, dendrogram, clusters and 
+The non-algorithm part (black) includes exploratory graphs, processing data, dendrogram, clusters and 
 plotting evaluation metrics. These are essentially the by-products of the algorithm part.
 
-The algorithm/model part does the heavy work including feature reduction, creating clusters,
-split data, create and optimize models and saving models. 
+The algorithm/model part (red) does the heavy work including feature reduction, creating clusters,
+split data, create, optimize and save models. 
 
-Additionally some components like hyper-parameter tuning has to be done only once for a set of data.
+Additionally some components like hyper-parameter tuning has to be done only once for a given set of data.
 They have to be updated/rerun only when new data is received.
 ```
 
 
-All of these above methods have been implemented in the [main.py](code/main.py) file inside the `code` folder. 
+All of these above steps have been implemented in the [main.py](code/main.py) file 
+located inside the `code` folder (This file takes approximately 3 minutes to run completely).  
 
-```class ClusterClassify``` handles the algorithmic side of the process while 
+Inside the `main.py`, ```class ClusterClassify``` handles the algorithmic side of the process while 
 ```class ModelPlots``` handles the non-algorithmic aspect.  
+
 
 ----
 <a name='CONCLUDE'/>
