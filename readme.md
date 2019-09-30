@@ -567,6 +567,6 @@ The clusters also provide a significant information towards the characteristics 
 and help us identify the uniqueness of each cluster. The dendrogram shows us which groups of
 children are similar (shows distance between each clusters as well). 
 
-The final saved model (saved from running `main.py`) can be run for new set of data in order 
-to predict their cluster/classes. 
+The final saved model (saved from running `main.py`) can be integrated with an
+ application to predict the cluster/classes for new set of data. 
   

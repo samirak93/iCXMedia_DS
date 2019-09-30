@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pandas as pd
 import numpy as np
 
@@ -12,6 +13,7 @@ from sklearn.cluster import AgglomerativeClustering
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
+from sklearn.model_selection import RandomizedSearchCV
 
 import scipy.cluster.hierarchy as shc
 
@@ -19,7 +21,10 @@ import pickle
 
 
 class ModelPlots:
-    def plot_dendogram(self):
+    """ Functions to plot dendrogram, classifier metrics,
+        clusters
+    """
+    def plot_dendrogram(self):
 
         plt.figure(figsize=(15, 15))
         plt.title("Patient Dendograms")
@@ -67,7 +72,12 @@ class ModelPlots:
 
 
 class ClusterClassify(ModelPlots):
-
+    """
+    Functions to get feature reduction,
+    create clusters, split train and test data,
+    get best model parameters, get accuracy,
+    save model
+    """
     def __init__(self, features_tsvd=None, clf=None):
         self.features_tsvd = None
         self.clf = RandomForestClassifier(n_estimators=600, max_depth=420, max_features='sqrt', random_state=40)
@@ -120,6 +130,27 @@ class ClusterClassify(ModelPlots):
 
         self.X_train, self.y_train, self.X_test, self.y_test = X_train, y_train, X_test, y_test
 
+    def get_best_params(self):
+        n_estimators = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]
+        max_features = ['auto', 'sqrt']
+
+        max_depth = [int(x) for x in np.linspace(100, 500, num=11)]
+        max_depth.append(None)
+
+        random_grid = {
+            'n_estimators': n_estimators,
+            'max_features': max_features,
+            'max_depth': max_depth
+        }
+
+        rfc_random = RandomizedSearchCV(estimator=self.clf, param_distributions=random_grid,
+                                        n_iter=100, cv=3, verbose=1,
+                                        random_state=40, n_jobs=-1)
+
+        rfc_random.fit(self.X_train, self.y_train)
+
+        self.clf = rfc_random.best_estimator_
+
     def get_model_accuracy(self):
         self.clf.fit(self.X_train, self.y_train)
         y_pred = self.clf.predict(self.X_test)
@@ -131,10 +162,10 @@ class ClusterClassify(ModelPlots):
         print('\nModel saved in model folder in main directory')
 
     def run_phases(self):
-        phases = (self.plot_dendogram(), self.get_clusters(),
+        phases = (self.plot_dendrogram(), self.get_clusters(),
                   self.plot_clusters(), self.get_test_train(),
-                  self.plot_classifier_metrics(), self.get_model_accuracy(),
-                  self.get_model_saved())
+                  self.get_best_params(), self.plot_classifier_metrics(),
+                  self.get_model_accuracy(), self.get_model_saved())
         for phase in phases:
             phase
 
