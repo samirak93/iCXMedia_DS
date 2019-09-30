@@ -17,6 +17,7 @@ import scipy.cluster.hierarchy as shc
 
 import pickle
 
+
 class ModelPlots:
     def plot_dendogram(self):
 
@@ -69,7 +70,7 @@ class ClusterClassify(ModelPlots):
 
     def __init__(self, features_tsvd=None, clf=None):
         self.features_tsvd = None
-        self.clf = RandomForestClassifier(n_estimators=100, random_state=40)
+        self.clf = RandomForestClassifier(n_estimators=600, max_depth=420, max_features='sqrt', random_state=40)
 
     def get_feature_reduce(self, df):
         tsvd = TruncatedSVD(n_components=50, random_state=40)

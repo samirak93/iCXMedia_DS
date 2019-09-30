@@ -27,12 +27,13 @@ The 'Class' field refers to the presence of the self-care problems of the childr
 
 ### <u>Goal:</u>
 
-Based on the features, some of the questions that can be answered from the project are:
+Based on the available features, some of the questions that can be answered from the project are:
 - Would it be possible to cluster children and compare how similar they're to
 each other? 
-- Can we identify groups of similar children and provide them similar healthcare?
+- Can we identify groups of similar children and provide them similar healthcare/treatment?
 - Identify children who might belong to a different group than the one they're currently in?
 - Identify potential children who might face different problems in future.
+- Identify groups and sub-groups and the factors that are unique to these groups. 
 
 ----
 
@@ -43,7 +44,7 @@ each other?
 - [Feature Engineering](#FE)
 - [Clustering - Dendrogram (find no of clusters)](#DE)
     - Hierarchical clustering
-- [Visualize clusters using t-sne](#TSNE)
+- [Visualize clusters using t-SNE](#TSNE)
 - [Cluster characteristics](#CC)
 
 <u>Classification:</u>
@@ -56,9 +57,9 @@ each other?
 
 #### Data cleaning and exploratory analysis:
 
-- Changing the `Gender` variable to `Categorical`
-- `Age` is set to `Numerical` (continuous variable)
-- `Classes` variable is stripped of word 'class' and converted as `Categorical`
+- Changed the `Gender` variable to `Categorical` data type. 
+- `Age` is set to `Numerical` (continuous variable) type.
+- `Classes` variable is stripped of word 'class' and converted as `Categorical` type. 
 
 ```df['Gender'] = pd.Categorical(df['Gender'])
 df['Age'] = pd.to_numeric(df['Age'])
@@ -142,28 +143,28 @@ in order to identify that pattern, I've included `classes` in the features.
 
 #### Clustering - Dendrogram (find no of clusters):
 
-So once the feature size has been reduced to a better scale, I'm using a hierarchical 
-clustering (Agglomerative) to find the cluster for each child. 
+So once the feature size has been reduced to a better scale, I'm using a `hierarchical 
+clustering (Agglomerative)` to find the cluster for each child. 
 
 The main reason for using Hierarchical clustering compared to other options are:
 - In this data set, it's ideal to not just cluster children but also find the distance 
 or similarity between each child or cluster. This would provide us information as to which 
-child is similar to another and maybe drill up/down to next cluster group. 
+child is similar to another and maybe drill up/down to next cluster groups. 
 - The hierarchy helps us to find similar sub-groups within each group, which could
 maybe help doctors/ SME's to find different patterns within each group and also find 
-interaction of these groups. 
+interaction of these groups to each other. 
 - For example, if 2 children have fever, they might be in same cluster and closer. 
 On the next level, you might have children who have more complicated disease. So if these
 2 children are closer to the other group, then doctor's could proactively identify these
-2 children and stop them from becoming worse.  
+2 children and stop them from going to worse condition.  
 - From the dataset perspective, the dataset is small and hence agglomerative clustering
-works perfectly and also plotting the dendrogram can easily help us identify similar
+works perfectly and also plotting the dendrogram is easy and can help us identify similar
 groups within the dataset.
 
 But before starting to create the dendrogram, we'd have to find out the `linkage` 
-type and `distance` metrics. 
+type and `distance` metrics that are needed for the clustering. 
 
-Considering the possible choices of linkage and distance metrics, 
+Considering the different possible choices of linkage and distance metrics, 
 the best choice was found out as below.
 
 For finding the best metric, we're considering the target label to be the `classes`.
@@ -172,7 +173,6 @@ For finding the best metric, we're considering the target label to be the `class
 X = features_sparse_tsvd
 y = df.loc[:, 'Classes'].astype(int)
 y = y.values
-print(y.shape)
 y=y.flatten()
 ```
 
@@ -221,12 +221,12 @@ dend = shc.dendrogram(shc.linkage(features_sparse_tsvd, method='ward'),orientati
 plt.tick_params(axis="x", labelsize=10,rotation='auto')
 ```
 
-<img src="/docs/dendogram.png" alt="Dendrogram" width="400"/>
+<img src="/docs/dendogram.png" alt="Dendrogram" width="600"/>
 
 
 From the dendrogram, we can see that the optimal number of clusters are 4. 
 
-The agglomerative clustering is done as below:
+Based on that, the agglomerative clustering is done as below:
 
 ```
 cluster = AgglomerativeClustering(n_clusters=4, affinity='euclidean', linkage='ward')
@@ -237,7 +237,7 @@ cluster_pred = cluster.fit_predict(features_sparse_tsvd)
 
 <a name='TSNE'/>
 
-#### Visualize clusters using t-sne:
+#### Visualize clusters using t-SNE:
 
 In order to visualize the clusters of 50 features, we use `t-distributed Stochastic Neighbor Embedding (t-SNE)`.
 The features are reduced to 2 dimension so that we can visualize the clusters using a simple scatter plot.
@@ -270,7 +270,7 @@ for line in range(0,features_sparse_tsvd_df.shape[0]):
 
 **Output:**
 
-<img src="/docs/clusters.png" alt="Clusters" width="400"/>
+<img src="/docs/clusters.png" alt="Clusters" width="600"/>
 
 ----
 
@@ -373,13 +373,14 @@ Cluster 3: Indicating need for urination, carrying out urination appropriately
 
 
 
+
 We could immediately identify that there are overlapping features between different cluster,
 which could indicate their distance / similarity between children. Again using a hierarchical
 clustering affirms the fact that a child who possesses similar features can be easily identified 
-and isolated amongst a subgroup. 
+and isolated amongst a group. 
 
 
-**<u>Overall Cluster characteristics:</u>**
+**<u>Overall cluster characteristics:</u>**
 ```
 Cluster 0: Mostly male children, aged around 12, choosing clothing and avoid drugs
 Cluster 1: Mostly female children, aged around 18, with proper sanitation 
@@ -387,24 +388,32 @@ Cluster 2: Mostly female children, aged around 12, with proper body wash
 Cluster 3: Equal proportion of children, aged around 8, with proper sanitation indication
 ```
 
+<img src="/docs/clusters_c.png" alt="Clusters Explanation" width="600"/>
+
+
 ----
 
 <a name='CLASS'/>
 
 #### Classification on features vs target label (cluster)
 
-Since we've the clusters/groups of children, we can use that as a label to classify future children.
+Since we've the created an unsupervised clusters/groups of children, 
+we can use that as a label to create a classification model which can be used to classify
+future patients.
 
-In this case, we've a good class balance:
+We've a good class balance in this scenario. In case we don't have proper class balance, we can use 
+an algorithm's inbuilt class balance penalty or use additional methods like `SMOTE` to impute 
+synthetic data.  
 
 <img src="/docs/class_balance.png" alt="Class Balance" width="400"/>
 
 
-In terms of choosing the classification model, I chose `Random Forest` because of following reasons:
+In terms of choosing the classification model, `Random Forest` was chosen because of following reasons:
 - The dataset is small (70 samples), hence using a complicated model like xgboost or neural networks would
 not be ideal.
-- Although there is a good class balance, using a bagging method would stop overfitting.
-- Working on high dimension data, handling outliers, mix of categorical and numerical data.
+- Although there is a good class balance, using a bagging method would stop overfitting and would 
+be better than a simple `decision tree`.
+- Random Forest works well on high dimension data, handling outliers, mix of categorical and numerical data.
 
 
 The data was split into 60-40%  for train and testing. 
@@ -415,19 +424,54 @@ clf.fit(X_train,y_train)
 y_pred=clf.predict(X_test)
 ```
 
+The initial micro-average of the model was around `93 %` which can be improved by using `cross validation`
+and `Randomized search` to find best hyper-parameters. 
+
+```
+n_estimators = [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)]
+max_features = ['auto', 'sqrt']
+
+max_depth = [int(x) for x in np.linspace(100, 500, num = 11)]
+max_depth.append(None)
+
+random_grid = {
+ 'n_estimators': n_estimators,
+ 'max_features': max_features,
+ 'max_depth': max_depth
+ }
+
+rfc_random = RandomizedSearchCV(estimator = clf, param_distributions = random_grid, n_iter = 100, cv = 3, verbose=2, random_state=42, n_jobs = -1)
+
+rfc_random.fit(X_train, y_train)
+
+print(rfc_random.best_params_)
+```  
+Output:
+
+```
+Fitting 3 folds for each of 100 candidates, totalling 300 fits
+[Parallel(n_jobs=-1)]: Using backend LokyBackend with 4 concurrent workers.
+[Parallel(n_jobs=-1)]: Done  33 tasks      | elapsed:   18.5s
+[Parallel(n_jobs=-1)]: Done 154 tasks      | elapsed:  1.2min
+[Parallel(n_jobs=-1)]: Done 300 out of 300 | elapsed:  2.1min finished
+{'n_estimators': 600, 'max_features': 'sqrt', 'max_depth': 420}
+```
+The new hyper-parameter `{'n_estimators': 600, 'max_features': 'sqrt', 'max_depth': 420}` improved 
+the micro-average to `95%`. 
+
 ----
 
 <a name='EVAL'/>
 
 #### Evaluation of Model
 
-```Overall Accuracy: 85%```
+```Overall Accuracy: 89%```
 
 **Evaluation metrics:** 
 
 <img src="/docs/metrics_classifier.png" alt="Classifier Metrics" width="600"/>
 
-Looking at the `confusion matrix`, class 1 has 3 errors and class 3 has 1 error. The cost of making
+Looking at the `confusion matrix`, class 1 has 2 errors and class 3 has 1 error. The cost of making
 a mistake could be different in each cluster/class.
 
 `Type 1 error:`
@@ -447,9 +491,9 @@ sanitation is proper.
 Even though the data set is small, we could see that the features have a good 
 indication towards the target classes.
 
-Class 0 has lowest `precision` of `0.75` and class 1 has lowest `recall` of `0.625`. 
+Class 0 has lowest `precision` of `0.75` and class 1 and 3 has lowest `recall` of `0.75`. 
 Since the classes are balanced to some extent, the average accuracy to be considered 
-can be either `micro` or `macro` and both are approximately `0.93` and `0.96` respectively.  
+can be either `micro` or `macro` and both are approximately `0.95` and `0.99` respectively.  
 
 <a name='SCALE'/>
 
@@ -473,7 +517,11 @@ plotting evaluation metrics. These are essentially the by-products of the algori
 
 The algorithm/model part does the heavy work including feature reduction, creating clusters,
 split data, create and optimize models and saving models. 
+
+Additionally some components like hyper-parameter tuning has to be done only once for a set of data.
+They have to be updated/rerun only when new data is received.
 ```
+
 
 All of these above methods have been implemented in the [main.py](code/main.py) file inside the `code` folder. 
 
