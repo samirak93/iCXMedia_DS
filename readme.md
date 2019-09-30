@@ -296,6 +296,7 @@ for line in range(0,features_sparse_tsvd_df.shape[0]):
 **Output:**
 
 <img src="/docs/clusters.png" alt="Clusters" width="600"/>
+
 (Numbers are each patient/child)
 
 
