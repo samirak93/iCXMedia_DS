@@ -388,7 +388,7 @@ Cluster 2: Mostly female children, aged around 12, with proper body wash
 Cluster 3: Equal proportion of children, aged around 8, with proper sanitation indication
 ```
 
-<img src="/docs/clusters_c.png" alt="Clusters Explanation" width="600"/>
+<img src="/docs/cluster_c.png" alt="Clusters Explanation" width="600"/>
 
 
 ----
