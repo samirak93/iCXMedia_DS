@@ -599,14 +599,14 @@ Inside the `main.py`, ```class ClusterClassify``` handles the algorithmic side o
 
 **<u>Conclusion:</u>** 
 
-Considering the small sample size, the model performs relatively efficient for all 
-target classes. The precision and recall for all classes are high and overall `micro and 
+The clusters created provided significant information towards the impact of features
+on each cluster and the characteristics of the clusters. The dendrogram shows us which groups of
+children are similar (also shows distance between each clusters as well).
+
+Considering the small sample size, the classification model performs efficiently for all 
+target classes. The precision and recall for all the classes are high and overall `micro and 
 macro average` are high as well. 
 
-The clusters also provide a significant information towards the characteristics of the children
-and help us identify the uniqueness of each cluster. The dendrogram shows us which groups of
-children are similar (shows distance between each clusters as well). 
-
-The final saved model (saved from running `main.py`) can be integrated with an
- application to predict the cluster/classes for new set of data. 
+Finally, the final saved model (saved from running `main.py`) can be integrated with an
+application to predict the cluster/classes for new set of real-time data. 
   

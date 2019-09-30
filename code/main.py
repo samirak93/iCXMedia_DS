@@ -88,7 +88,7 @@ class ClusterClassify(ModelPlots):
         # Conduct TSVD on sparse matrix
         features_sparse_tsvd = tsvd.fit(df).transform(df)
 
-        # Show results
+
         print("Original number of features:", df.shape[1])
         print("Reduced number of features:", features_sparse_tsvd.shape[1])
         print("Total Variance captured:", tsvd.explained_variance_ratio_.sum())
@@ -112,7 +112,7 @@ class ClusterClassify(ModelPlots):
 
         # Avg age per cluster
         print("\nAverage age per cluster\n", df.groupby('Cluster')['Age'].mean())
-        # Gender 1-male, 2-female
+        # Gender 1-male, 0-female
         print("\nGender per cluster\n", df.groupby('Cluster')['Gender'].value_counts())
         print("\nClasses per cluster\n", df.groupby('Cluster')['Classes'].value_counts())
 
