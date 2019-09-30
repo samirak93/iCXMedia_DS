@@ -353,7 +353,8 @@ So cluster 3 has children in lower age groups having the highest class of proble
 which is understandable.
 ```
 
-Looking at the main features - self care activities, each cluster has these characteristics:
+Looking at the main features - self care activities, each cluster has these
+ top characteristics:
 
 ```
 Cluster 0: Choosing appropriate clothing, avoid risk of abuse of drugs or chemicals
@@ -376,6 +377,15 @@ We could immediately identify that there are overlapping features between differ
 which could indicate their distance / similarity between children. Again using a hierarchical
 clustering affirms the fact that a child who possesses similar features can be easily identified 
 and isolated amongst a subgroup. 
+
+
+**<u>Overall Cluster characteristics:</u>**
+```
+Cluster 0: Mostly male children, aged around 12, choosing clothing and avoid drugs
+Cluster 1: Mostly female children, aged around 18, with proper sanitation 
+Cluster 2: Mostly female children, aged around 12, with proper body wash
+Cluster 3: Equal proportion of children, aged around 8, with proper sanitation indication
+```
 
 ----
 
@@ -415,9 +425,24 @@ y_pred=clf.predict(X_test)
 
 **Evaluation metrics:** 
 
-<img src="/docs/metrics_classifier.png" alt="Classifier Metrics" width="400"/>
+<img src="/docs/metrics_classifier.png" alt="Classifier Metrics" width="600"/>
 
-Looking at the `confusion matrix`, class 1 has 3 errors and class 3 has 1 error.
+Looking at the `confusion matrix`, class 1 has 3 errors and class 3 has 1 error. The cost of making
+a mistake could be different in each cluster/class.
+
+`Type 1 error:`
+
+In a case where a child has bad habits like drugs (cluster 3) but model predicts that child would 
+avoid drugs (cluster 0), then the issue is critical since failure to identify this issue would 
+have huge impact/cost on the child. 
+
+`Type 2 error:`
+
+For example, class 1 has children with proper sanitaion.
+So if they're wrongly categorized into a class where children are with improper sanitation, then mistake
+is not a big problem since more emphasis would be made on a child to improve sanitation even when their
+sanitation is proper. 
+
 
 Even though the data set is small, we could see that the features have a good 
 indication towards the target classes.
@@ -432,9 +457,10 @@ can be either `micro` or `macro` and both are approximately `0.93` and `0.96` re
 
 #### Scaling the model
 
-In order to replicate the model in a production environment, few things have to be considered.
+In order to replicate the model in a production environment, few things have to be considered when
+developing the code/process.
 The entire process has to be split into 2 parts - Algorithm/Model related activities vs 
-Non Algorithm/Model related. This gives the flexibility to update or modify the pipeline 
+Non Algorithm/Model activities. This gives the flexibility to update or modify the pipeline 
 based on the type and need.
 
  <img src="/docs/scaling.png" alt="Scaling" width="600"/>
@@ -449,14 +475,13 @@ The algorithm/model part does the heavy work including feature reduction, creati
 split data, create and optimize models and saving models. 
 ```
 
-All of these above methods has been implemented in the `main.py` file inside the `code` folder 
-[here](code/main.py). 
+All of these above methods have been implemented in the [main.py](code/main.py) file inside the `code` folder. 
 
-```class ClusterClassify:``` handles the algorithmic side of the process while 
+```class ClusterClassify``` handles the algorithmic side of the process while 
 ```class ModelPlots``` handles the non-algorithmic aspect.  
 
 
-**Conclusion:** 
+**<u>Conclusion:</u>** 
 
 Considering the small sample size, the model performs relatively efficient for all 
 target classes. 
