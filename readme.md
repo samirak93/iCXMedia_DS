@@ -1,5 +1,17 @@
-### <center>iCX Media Data Science Task</center>
-##### <center>Samira Kumar Varadharajan</center>
+<h3> <center>iCX Media Data Science Task</center></h3>
+
+<h5> <center>Samira Kumar Varadharajan</center></h5>
+
+##### Inside the repository:
+- `code`: Contains the jupyter notebook [Pre-Process.ipynb](code/Pre-Process.ipynb), 
+[main.py](code/main.py) contains the production equivalent code.
+- `data`: Contains the dataset for the task.
+- `docs`: Contains images for various analysis. `main.py` refers this folder to save plots.
+- `model`: Contains the model saved while running `main.py`.  
+ 
+`Pre-Process.ipynb` does a lot of exploratory analysis and tries out different approaches.
+
+`main.py` is a more refined and production level finalized code for the task.  
 
 ##### DATASET:
 
