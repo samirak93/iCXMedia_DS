@@ -65,8 +65,7 @@ each other?
 - [Classification on features vs target label (cluster)](#CLASS)
 - [Evaluation of model](#EVAL)
 - [Scaling the model to production](#SCALE)
-
-----
+- [Conclusion](#CONCLUDE)
 
 <a name='EDA'/>
 
@@ -555,6 +554,8 @@ All of these above methods have been implemented in the [main.py](code/main.py) 
 ```class ClusterClassify``` handles the algorithmic side of the process while 
 ```class ModelPlots``` handles the non-algorithmic aspect.  
 
+----
+<a name='CONCLUDE'/>
 
 **<u>Conclusion:</u>** 
 
