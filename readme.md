@@ -50,6 +50,7 @@ each other?
 <u>Classification:</u>
 - [Classification on features vs target label (cluster)](#CLASS)
 - [Evaluation of model](#EVAL)
+- [Scaling the model to production](#SCALE)
 
 ----
 
