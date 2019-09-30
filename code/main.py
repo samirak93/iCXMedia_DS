@@ -20,9 +20,10 @@ import pickle
 class ModelPlots:
     def plot_dendogram(self):
 
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(15, 15))
         plt.title("Patient Dendograms")
         dend = shc.dendrogram(shc.linkage(self.features_tsvd, method='ward'), orientation='top')
+        plt.tick_params(axis="x", labelsize=10, rotation='auto')
         plt.savefig('../docs/dendogram.png')
         plt.show()
 
