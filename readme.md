@@ -11,11 +11,13 @@
  
 `Pre-Process.ipynb` does a lot of exploratory analysis and tries out different approaches.
 
-`main.py` is a more refined and production level finalized code for the task.  
+`main.py` is more polished and production level code for the task.  
+
+----
 
 ##### DATASET:
 
-[SCADI Data Set](https://archive.ics.uci.edu/ml/datasets/SCADI)
+[SCADI Data Set](https://archive.ics.uci.edu/ml/datasets/SCADI) - UCI ML Repository
 
 **<u>Description:</u>** 
 
