@@ -363,11 +363,11 @@ Cluster 2: Washing whole body, drying oneself
 Cluster 3: Indicating need for urination, carrying out urination appropriately
 ```
 
-<img src="/docs/top10.png" alt="Top 10 features for each cluster" width="400"/>
+<img src="/docs/top10.png" alt="Top 10 features for each cluster" width="600"/>
 
 
 
-**Note:** The self care activities were identifed from the below table.
+**Note:** The self care activities were identified from the below table.
 
 <img src="/docs/categories.png" alt="categories" width="400"/>
 
@@ -467,6 +467,10 @@ the micro-average to `95%`.
 
 ```Overall Accuracy: 89%```
 
+In problems like classification, overall accuracy wouldn't indicate the right picture in terms of 
+how each class is performing on its own. So to get a better picture of the model, we should look at
+`confusion matrix, precision recall and f1-score, ROC curve `.
+
 **Evaluation metrics:** 
 
 <img src="/docs/metrics_classifier.png" alt="Classifier Metrics" width="600"/>
@@ -482,7 +486,7 @@ have huge impact/cost on the child.
 
 `Type 2 error:`
 
-For example, class 1 has children with proper sanitaion.
+For example, class 1 has children with proper sanitation.
 So if they're wrongly categorized into a class where children are with improper sanitation, then mistake
 is not a big problem since more emphasis would be made on a child to improve sanitation even when their
 sanitation is proper. 
@@ -491,21 +495,26 @@ sanitation is proper.
 Even though the data set is small, we could see that the features have a good 
 indication towards the target classes.
 
-Class 0 has lowest `precision` of `0.75` and class 1 and 3 has lowest `recall` of `0.75`. 
+Overall, class 0 has lowest `precision` of `0.75` and class 1 and 3 has lowest `recall` of `0.75`. 
 Since the classes are balanced to some extent, the average accuracy to be considered 
 can be either `micro` or `macro` and both are approximately `0.95` and `0.99` respectively.  
 
-<a name='SCALE'/>
+Overall the improved model (after random search) performs well for all classes considering the ROC 
+and precision/recall outputs.  
+
 
 ----
 
-#### Scaling the model
+<a name='SCALE'/>
+
+#### Scaling the model to production
 
 In order to replicate the model in a production environment, few things have to be considered when
 developing the code/process.
+
 The entire process has to be split into 2 parts - Algorithm/Model related activities vs 
 Non Algorithm/Model activities. This gives the flexibility to update or modify the pipeline 
-based on the type and need.
+based on the type of update and need. 
 
  <img src="/docs/scaling.png" alt="Scaling" width="600"/>
 
