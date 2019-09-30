@@ -34,7 +34,8 @@ The 'Class' field refers to the presence of the self-care problems of the childr
     206: Classes ( class1 = Caring for body parts problem; class2 = Toileting problem; class3 = Dressing problem; 
     class4 = Washing oneself and Caring for body parts and Dressing problem; 
     class5 = Washing oneself, Caring for body parts, Toileting, and Dressing problem; 
-    class6 = Eating, Drinking, Washing oneself, Caring for body parts, toileting,Dressing, Looking after oneâ€™s health and Looking after oneâ€™s safety problem; 
+    class6 = Eating, Drinking, Washing oneself, Caring for body parts, toileting,Dressing, 
+    Looking after one's health and Looking after one's safety problem; 
     class7 = No Problem)
 
 ----
@@ -42,12 +43,17 @@ The 'Class' field refers to the presence of the self-care problems of the childr
 ### <u>Goal:</u>
 
 Based on the available features, some of the questions that can be answered from the project are:
-- Would it be possible to cluster children and compare how similar they're to
+- Would it be possible to cluster children and compare how similar (distance) they're to
 each other? 
 - Can we identify groups of similar children and provide them similar healthcare/treatment?
-- Identify children who might belong to a different group than the one they're currently in?
-- Identify potential children who might face different problems in future.
-- Identify groups and sub-groups and the factors that are unique to these groups. 
+- Identify children who should belong to a different group than the one they're currently in?
+- Identify children who might face potential problems in future.
+- Identify the factors that are unique to each cluster or sub-groups. 
+- Once clusters are created, can it be effectively used to create target labels for new data?
+
+To answer these questions, first we'd have to find the clusters (unsupervised) and then 
+identify the characteristics of each cluster. Then these clusters are considered as target labels
+and used in a classification model (supervised) to classify future data. 
 
 ----
 
@@ -56,10 +62,9 @@ each other?
 <u>Clustering:</u>
 - [Data cleaning and exploratory analysis:](#EDA)
 - [Feature Engineering](#FE)
-- [Clustering - Dendrogram (find no of clusters)](#DE)
-    - Hierarchical clustering
+- [Hierarchical Clustering - Dendrogram](#DE)
 - [Visualize clusters using t-SNE](#TSNE)
-- [Cluster characteristics](#CC)
+- [Identify Cluster characteristics](#CC)
 
 <u>Classification:</u>
 - [Classification on features vs target label (cluster)](#CLASS)
@@ -75,13 +80,15 @@ each other?
 - `Age` is set to `Numerical` (continuous variable) type.
 - `Classes` variable is stripped of word 'class' and converted as `Categorical` type. 
 
-```df['Gender'] = pd.Categorical(df['Gender'])
+```
+df['Gender'] = pd.Categorical(df['Gender'])
 df['Age'] = pd.to_numeric(df['Age'])
 df['Classes'] = df['Classes'].str.replace('class','')
 df['Classes'] = pd.Categorical(df['Classes'])
 ```
 
 **<u>Gender Distribution</u>**
+
 ```
 plt.figure(figsize=(7, 4))
 plt.title("Gender Distribution")
@@ -119,11 +126,13 @@ plt.show()
 
 #### Feature Engineering:
 
-Since the data has 206 features, considering all the features for the clustering is not a good practice
-since around 203 features are sparse (0s and 1s) and having higher features might not 
-provide best solution. So in order to reduce the feature dimension, we're using 
+Since the data has 206 features, considering all the features for the clustering is not an ideal practice
+since around 203 features are sparse (0s and 1s) and having higher feature dimension might not 
+provide the best solution. So in order to reduce the feature dimension, we're using 
 `Truncated Singular Value Decomposition (TruncatedSVD)` to reduce features to `50` and also
-maintain variance of `0.99`. 
+maintain variance of `0.99`. TSVD is used here instead of PCA because input data is sparse and TSVD 
+works better on sparse data compared to PCA.
+
 
 ```
 df_tsvd = df.copy()
@@ -146,37 +155,38 @@ Reduced number of features: 50
 Total Variance 0.997368053105751
 ```
 
-For this clustering, I've included the `classes` feature as well in order to identify
-similar children across different classes i.e:- Some children might have similar 
-features/attributes even though they might be tagged under a different class. So
-in order to identify that pattern, I've included `classes` in the features. 
+**Note:** For this clustering problem, I've included the variable `classes` as a feature 
+in order to identify similar children across different classes i.e:- Some children
+might have similar features/attributes even though they might be tagged under a different 
+class. So in order to identify this pattern, variable `classes` is considered as a feature. 
 
 ----
 
 <a name='DE'/>
 
-#### Clustering - Dendrogram (find no of clusters):
+#### Hierarchical Clustering - Dendrogram:
 
-So once the feature size has been reduced to a better scale, I'm using a `hierarchical 
+Once the feature size has been reduced to a better scale, I'm using a `hierarchical 
 clustering (Agglomerative)` to find the cluster for each child. 
 
 The main reason for using Hierarchical clustering compared to other options are:
+
 - In this data set, it's ideal to not just cluster children but also find the distance 
 or similarity between each child or cluster. This would provide us information as to which 
-child is similar to another and maybe drill up/down to next cluster groups. 
+child is similar to another and maybe drill up/down to nearby cluster groups. 
 - The hierarchy helps us to find similar sub-groups within each group, which could
-maybe help doctors/ SME's to find different patterns within each group and also find 
+help doctors/ SME's to find different patterns within each group and also find 
 interaction of these groups to each other. 
-- For example, if 2 children have fever, they might be in same cluster and closer. 
-On the next level, you might have children who have more complicated disease. So if these
-2 children are closer to the other group, then doctor's could proactively identify these
-2 children and stop them from going to worse condition.  
+- For example, if 2 children have fever, they might be in same cluster (could be the lowest starting cluster) 
+and closer to each other. On the next level, you might have children who have more complicated disease. 
+So if these 2 children are closer to the other complicated group, then doctor's could proactively identify 
+these 2 children and stop them from going to worse condition.
 - From the dataset perspective, the dataset is small and hence agglomerative clustering
 works perfectly and also plotting the dendrogram is easy and can help us identify similar
 groups within the dataset.
 
 But before starting to create the dendrogram, we'd have to find out the `linkage` 
-type and `distance` metrics that are needed for the clustering. 
+type and `distance` metrics that are needed for the clustering algorithm. 
 
 Considering the different possible choices of linkage and distance metrics, 
 the best choice was found out as below.
@@ -187,7 +197,7 @@ For finding the best metric, we're considering the target label to be the `class
 X = features_sparse_tsvd
 y = df.loc[:, 'Classes'].astype(int)
 y = y.values
-y=y.flatten()
+y = y.flatten()
 ```
 
 ```
@@ -211,6 +221,7 @@ index=['single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward'
 print(results)
 ```
 **Output:**
+
 ```
               ARI  Completeness  Silhouette
 single    0.208778      0.634543   -0.042088
@@ -222,11 +233,11 @@ median    0.220518      0.575907    0.075075
 ward      0.729150      0.736630    0.230340
 ```
 
-So the combination of `Euclidean` and `Ward` provides the best `Adjusted Rand Index (ARI)` (Similarity in 
-clusters), `Silhouette score`. 
+So the combination of `Euclidean` and `Ward` provides the best `Adjusted Rand Index (ARI)` (similarity in 
+clusters), `Silhouette score` and `Completeness`. Higher the value, closer to 1, better the metrics. 
 
 
-Then we can plot the dendrogram and visualize the agglomerative clustering of the data. 
+Using these parameters, we can plot the dendrogram and visualize the agglomerative clustering for the data. 
 
 ```
 plt.figure(figsize=(15, 15))
@@ -238,9 +249,9 @@ plt.tick_params(axis="x", labelsize=10,rotation='auto')
 <img src="/docs/dendogram.png" alt="Dendrogram" width="600"/>
 
 
-From the dendrogram, we can see that the optimal number of clusters are 4. 
+From the dendrogram, we can see that the optimal number of clusters are 4 (based on the cut-off rule).
 
-Based on that, the agglomerative clustering is done as below:
+Based on that information, the agglomerative clustering is done as below:
 
 ```
 cluster = AgglomerativeClustering(n_clusters=4, affinity='euclidean', linkage='ward')
@@ -254,7 +265,7 @@ cluster_pred = cluster.fit_predict(features_sparse_tsvd)
 #### Visualize clusters using t-SNE:
 
 In order to visualize the clusters of 50 features, we use `t-distributed Stochastic Neighbor Embedding (t-SNE)`.
-The features are reduced to 2 dimension so that we can visualize the clusters using a simple scatter plot.
+Using t-SNE, the features are reduced to 2 dimensions so that we can visualize the clusters using a scatter plot.
 
 
 ```
@@ -292,12 +303,15 @@ for line in range(0,features_sparse_tsvd_df.shape[0]):
 
 <a name='CC'/>
 
-#### Cluster characteristics
+#### Identify cluster characteristics:
+
+The characteristics of each cluster is explained below. 
 
 **Average/Median Cluster Age**: 
 
-```Average age per cluster
- Cluster
+```
+Average age per cluster
+Cluster Average_Age
 0    11.653846
 1    17.500000
 2    11.100000
@@ -306,7 +320,7 @@ for line in range(0,features_sparse_tsvd_df.shape[0]):
 
 ```
 Median age per cluster
- Cluster
+Cluster  Median_Age
 0    12
 1    18
 2    11
@@ -317,8 +331,8 @@ We can see that children in cluster 0 and 2 are similar in age groups and cluste
 are extreme (18 and 9 year old respectively). 
 
 ```
-Gender per cluster
- Cluster  Gender
+Total Gender per cluster
+Cluster  Gender  Total
 0        1         14
          0         12
 1        0         10
@@ -329,22 +343,23 @@ Gender per cluster
          1          5
 ```
 
-In terms of gender, the female children dominate cluster 1 and 2, while male children 
-dominate cluster 0. Cluster 3 has equal proportion. 
-Until now, we could say that:
+In terms of gender, female children dominate cluster 1 and 2, while male children 
+dominate cluster 0. Cluster 3 has equal proportion of both gender. 
+
+Until now, we could conclude that each cluster has:
 
 ```
-Cluster 0: Mostly male children, aged around 12
-Cluster 1: Mostly female children, aged around 18 
-Cluster 2: Mostly female children, aged around 12
-Cluster 3: Equal proportion of children, aged around 8
+Cluster 0: High male children, aged around 12
+Cluster 1: High female children, aged around 18 
+Cluster 2: High female children, aged around 12
+Cluster 3: Equal proportion of both gender, aged around 8
 ```
 
-In terms of classes, some of the finding between clusters are as below. 
+In terms of `classes`, some of the findings between clusters are as below. 
 
 ```
-Classes per cluster
- Cluster  Classes
+Total Classes per cluster
+Cluster  Classes  Total
 0        4          11
          7           5
          2           4
@@ -362,15 +377,20 @@ Classes per cluster
 ```
 
 Cluster 0 is dominated by class 4, cluster 1 is dominated by class 6, cluster 2 
-is also dominated by class 6 and cluster 3 has class 7 alone. 
+is also dominated by class 6 and cluster 3 has class 7 alone. Based on the data description, 
+cluster 3 has all children are in ideal condition and have no problem. 
+So children with similar characteristics, but away from the cluster 3, 
+can be considered that they might soon become `class 7` one day.
 
 ```
-So cluster 3 has children in lower age groups having the highest class of problems,
-which is understandable.
+So cluster 3 has the best possible group of children where the age is lower (around 9) 
+and they've no problems. So this cluster acts as the focal point for all clusters where
+children in other clusters have problems and would ideally want to move to cluster 3 as 
+problem free.
 ```
 
-Looking at the main features - self care activities, each cluster has these
- top characteristics:
+Looking at the main features of self care activities, each cluster has these
+ top 2 characteristics:
 
 ```
 Cluster 0: Choosing appropriate clothing, avoid risk of abuse of drugs or chemicals
@@ -389,19 +409,20 @@ Cluster 3: Indicating need for urination, carrying out urination appropriately
 
 
 
-
 We could immediately identify that there are overlapping features between different cluster,
 which could indicate their distance / similarity between children. Again using a hierarchical
-clustering affirms the fact that a child who possesses similar features can be easily identified 
+clustering affirms the fact that children who possesses similar features can be easily identified 
 and isolated amongst a group. 
 
+**Overall cluster characteristics:**
 
-**<u>Overall cluster characteristics:</u>**
+Combining all the things that were learnt so far, we could say that:
+
 ```
 Cluster 0: Mostly male children, aged around 12, choosing clothing and avoid drugs
 Cluster 1: Mostly female children, aged around 18, with proper sanitation 
 Cluster 2: Mostly female children, aged around 12, with proper body wash
-Cluster 3: Equal proportion of children, aged around 8, with proper sanitation indication
+Cluster 3: Equal proportion of both gender, aged around 8, with proper sanitation indication
 ```
 
 <img src="/docs/cluster_c.png" alt="Clusters Explanation" width="600"/>
@@ -415,21 +436,22 @@ Cluster 3: Equal proportion of children, aged around 8, with proper sanitation i
 
 Since we've the created an unsupervised clusters/groups of children, 
 we can use that as a label to train a classification model which can be used to classify
-new patients. The cluster labels are now the target labels and the existing features from TSVD 
-are the features. 
+new patients. The cluster labels are now considered as target labels and the existing features from TSVD 
+are the features for the model. 
 
 We've a good class balance in this scenario. In case we don't have proper class balance, we can use 
-an algorithm's inbuilt class balance penalty or use additional methods like `SMOTE` to impute 
+an algorithm's inbuilt class balance penalty factor or use separate methods like `SMOTE` to impute 
 synthetic data.  
 
 <img src="/docs/class_balance.png" alt="Class Balance" width="400"/>
 
 
 In terms of choosing the classification model, `Random Forest` was chosen because of following reasons:
-- The dataset is small (70 samples), hence using a complicated model like xgboost or neural networks would
-not be ideal.
+
+- The data set is small (70 samples), hence using a complicated model like xgboost or neural networks would
+not be ideal. 
 - Although there is a good class balance, using a bagging method would stop overfitting and would 
-be better than a simple `decision tree`.
+perform better than a simple `decision tree`.
 - Random Forest works well on high dimension data, handling outliers, mix of categorical and numerical data.
 
 
@@ -441,8 +463,9 @@ clf.fit(X_train,y_train)
 y_pred=clf.predict(X_test)
 ```
 
-The initial micro-average of the model was around `93 %` which can be improved by using `cross validation`
-and `Randomized search` to find best hyper-parameters. 
+The initial micro-average of the model was around `93 %`, which is good but can be improved by 
+using additional methods like `cross validation` for training model 
+and `Randomized search` to find best hyper-parameters for the model. 
 
 ```
 n_estimators = [int(x) for x in np.linspace(start = 200, stop = 2000, num = 10)]
