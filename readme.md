@@ -11,7 +11,7 @@
  
 `Pre-Process.ipynb` does a lot of exploratory analysis and tries out different approaches.
 
-`main.py` is more polished and production level code for the task.  
+`main.py` is the production level code for the task.  
 
 ----
 
@@ -45,7 +45,7 @@ The 'Class' field refers to the presence of the self-care problems of the childr
 Based on the available features, some of the questions that can be answered from the project are:
 - Would it be possible to cluster children and compare how similar (distance) they're to
 each other? 
-- Can we identify groups of similar children and provide them similar healthcare/treatment?
+- Can we identify groups of similar children and provide them similar healthcare/treatment in future?
 - Identify children who should belong to a different group than the one they're currently in?
 - Identify children who might face potential problems in future.
 - Identify the factors that are unique to each cluster or sub-groups. 
@@ -77,7 +77,7 @@ and used in a classification model (supervised) to classify future data.
 #### Data cleaning and exploratory analysis:
 
 - Changed the `Gender` variable to `Categorical` data type. 
-- `Age` is set to `Numerical` (continuous variable) type.
+- Variable `Age` is changed to `Numerical` (continuous variable) type.
 - `Classes` variable is stripped of word 'class' and converted as `Categorical` type. 
 
 ```
@@ -86,6 +86,8 @@ df['Age'] = pd.to_numeric(df['Age'])
 df['Classes'] = df['Classes'].str.replace('class','')
 df['Classes'] = pd.Categorical(df['Classes'])
 ```
+
+#### Exploratory Analysis:
 
 **<u>Gender Distribution</u>**
 
@@ -128,8 +130,8 @@ plt.show()
 
 Since the data has 206 features, considering all the features for the clustering is not an ideal practice
 since around 203 features are sparse (0s and 1s) and having higher feature dimension might not 
-provide the best solution. So in order to reduce the feature dimension, we're using 
-`Truncated Singular Value Decomposition (TruncatedSVD)` to reduce features to `50` and also
+provide the best solution for the model. So in order to reduce the feature dimension, we're using 
+`Truncated Singular Value Decomposition (TruncatedSVD)` to reduce feature dimension to `50` and
 maintain variance of `0.99`. TSVD is used here instead of PCA because input data is sparse and TSVD 
 works better on sparse data compared to PCA.
 
@@ -181,9 +183,9 @@ interaction of these groups to each other.
 and closer to each other. On the next level, you might have children who have more complicated disease. 
 So if these 2 children are closer to the other complicated group, then doctor's could proactively identify 
 these 2 children and stop them from going to worse condition.
-- From the dataset perspective, the dataset is small and hence agglomerative clustering
+- From the data set perspective, the data set is small and hence agglomerative clustering
 works perfectly and also plotting the dendrogram is easy and can help us identify similar
-groups within the dataset.
+groups within the data set.
 
 But before starting to create the dendrogram, we'd have to find out the `linkage` 
 type and `distance` metrics that are needed for the clustering algorithm. 
@@ -329,7 +331,7 @@ Cluster  Median_Age
 ```
 
 We can see that children in cluster 0 and 2 are similar in age groups and cluster 1 and 3
-are extreme (18 and 9 year old respectively). 
+are extremely opposite (18 and 9 year old respectively). 
 
 ```
 Total Gender per cluster
@@ -391,7 +393,7 @@ problem free.
 ```
 
 Looking at the main features of self care activities, each cluster has these
- top 2 characteristics:
+top 2 characteristics:
 
 ```
 Cluster 0: Choosing appropriate clothing, avoid risk of abuse of drugs or chemicals
@@ -411,13 +413,13 @@ Cluster 3: Indicating need for urination, carrying out urination appropriately
 
 
 We could immediately identify that there are overlapping features between different cluster,
-which could indicate their distance / similarity between children. Again using a hierarchical
+which could indicate their distance / similarity between children. Using a hierarchical
 clustering affirms the fact that children who possesses similar features can be easily identified 
-and isolated amongst a group. 
+and isolated. 
 
 **Overall cluster characteristics:**
 
-Combining all the things that were learnt so far, we could say that:
+Combining all the things that were learnt so far for each cluster, we could say that:
 
 ```
 Cluster 0: Mostly male children, aged around 12, choosing clothing and avoid drugs
@@ -437,12 +439,12 @@ Cluster 3: Equal proportion of both gender, aged around 8, with proper sanitatio
 
 Since we've the created an unsupervised clusters/groups of children, 
 we can use that as a label to train a classification model which can be used to classify
-new patients. The cluster labels are now considered as target labels and the existing features from TSVD 
-are the features for the model. 
+new patients. The cluster labels are now considered as target labels and the existing features from
+TSVD are the features for the model. 
 
 We've a good class balance in this scenario. In case we don't have proper class balance, we can use 
 an algorithm's inbuilt class balance penalty factor or use separate methods like `SMOTE` to impute 
-synthetic data.  
+synthetic data. 
 
 <img src="/docs/class_balance.png" alt="Class Balance" width="400"/>
 
@@ -453,7 +455,7 @@ In terms of choosing the classification model, `Random Forest` was chosen becaus
 not be ideal. 
 - Although there is a good class balance, using a bagging method would stop overfitting and would 
 perform better than a simple `decision tree`.
-- Random Forest works well on high dimension data, handling outliers, mix of categorical and numerical data.
+- Random Forest works well on high dimension data, handling outliers, mix of categorical and numerical features.
 
 
 The data was split into 60-40%  for train and testing. 
@@ -464,7 +466,7 @@ clf.fit(X_train,y_train)
 y_pred=clf.predict(X_test)
 ```
 
-The initial micro-average of the model was around `93 %`, which is good but can be improved by 
+The initial micro-average of the model was `93 %` but it could be improved by 
 using additional methods like `cross validation` for training model 
 and `Randomized search` to find best hyper-parameters for the model. 
 
@@ -487,6 +489,7 @@ rfc_random.fit(X_train, y_train)
 
 print(rfc_random.best_params_)
 ```  
+
 Output:
 
 ```
@@ -506,10 +509,12 @@ the micro-average to `95%`.
 
 #### Evaluation of Model
 
+The best parameters were used to build the Random Forest model. 
+
 ```Overall Accuracy: 89%```
 
-In problems like classification, overall accuracy wouldn't indicate the right picture in terms of 
-how each class is performing on its own. So to get a better picture of the model, we should look at
+In problems like classification, overall accuracy would not explain 
+how each class is performing on its own. So to get a better sense of the model, we should look at
 `confusion matrix, precision recall and f1-score, ROC curve `.
 
 **Evaluation metrics:** 
@@ -518,8 +523,8 @@ how each class is performing on its own. So to get a better picture of the model
 
 
 
-Looking at the `confusion matrix`, class 1 has 2 errors and class 3 has 1 error. The cost of making
-a mistake could be different in each cluster/class.
+Looking at the `confusion matrix`, class 1 has 2 errors and class 3 has 1 error. This is low but 
+the cost of making an error could be different in each cluster/class.
 
 `Type 1 error:`
 
@@ -534,7 +539,6 @@ So if they're wrongly categorized into a class where children are with improper 
 is not a big problem since more emphasis would be made on a child to improve sanitation even when their
 sanitation is proper. 
 
-
 Even though the data set is small, we could see that the features have a good 
 indication towards the target classes.
 
@@ -542,15 +546,15 @@ Overall, class 0 has lowest `precision` of `0.75` and class 1 and 3 has lowest `
 Since the classes are balanced to some extent, the average accuracy to be considered 
 can be either `micro` or `macro` and both are approximately `0.95` and `0.99` respectively.  
 
-Overall the improved model (after random search) performs well for all classes considering the ROC 
-and precision/recall outputs.  
+Overall the improved model (after random search CV) performs well for all classes considering the
+updated ROC and precision/recall outputs.  
+
+<img src="/docs/valid_score.png" alt="Validation Score" width="400"/>
+
 
 Considering the small sample size (70), the model's `cross validation score` is lower than 
 the `training score` but the difference is small. Also the model suffers from variance since there is a high shaded region around
 the cross validation score in below graph. 
-
-
- <img src="/docs/valid_score.png" alt="Validation Score" width="600"/>
 
 
 ----
@@ -571,7 +575,7 @@ to add new updates or modify like model parameters.
 The outline of the process is sketched below:
 
 
- <img src="/docs/scaling.png" alt="Scaling" width="600"/>
+<img src="/docs/scaling.png" alt="Scaling" width="600"/>
 
 
 
