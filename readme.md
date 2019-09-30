@@ -1,4 +1,4 @@
-<h3> <center>iCX Media Data Science Task</center></h3>
+<h3> <center>ICX Media Data Science Task</center></h3>
 
 <h5> <center>Samira Kumar Varadharajan</center></h5>
 

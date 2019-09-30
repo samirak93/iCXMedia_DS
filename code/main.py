@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+# ICX Media Data Science Task
+# Samira Kumar Varadharajan
+
 import pandas as pd
 import numpy as np
 
