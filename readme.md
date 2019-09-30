@@ -5,14 +5,14 @@
 
 [SCADI Data Set](https://archive.ics.uci.edu/ml/datasets/SCADI)
 
-<u>Description:</u> 
+**<u>Description:</u>** 
 
 This dataset contains 206 attributes of 70 children with physical and motor disability based on ICF-CY.
 In particular, the SCADI dataset is the only one that has been used by ML researchers for self-care problems classification based on ICF-CY to this date.
 The 'Class' field refers to the presence of the self-care problems of the children with physical and motor disabilities.The classes are determined by occupational therapists.
 
 
-<u>Attribute Information:</u>
+**<u>Attribute Information:</u>**
 
     1: gender: gender (1 = male; 0 = female)
     2: age: age in years
@@ -49,7 +49,6 @@ each other?
 <u>Classification:</u>
 - [Classification on features vs target label (cluster)](#CLASS)
 - [Evaluation of model](#EVAL)
-- Save model for future use
 
 ----
 
@@ -67,7 +66,7 @@ df['Classes'] = df['Classes'].str.replace('class','')
 df['Classes'] = pd.Categorical(df['Classes'])
 ```
 
-<u>Gender Distribution</u>
+**<u>Gender Distribution</u>**
 ```
 plt.figure(figsize=(7, 4))
 plt.title("Gender Distribution")
@@ -77,7 +76,7 @@ plt.show()
 <img src="/docs/gender_distribution.png" alt="Gender Distribution" width="400"/>
 
 
-<u>Age Histogram</u>
+**<u>Age Histogram</u>**
 
 - Large portion of 70 children lie between ages 8 to 16
 
@@ -90,7 +89,7 @@ plt.show()
 <img src="/docs/age_histogram.png" alt="Age Histogram" width="400"/>
 
 
-<u>Class Distribution</u>
+**<u>Class Distribution</u>**
 ```
 plt.figure(figsize=(7, 4))
 plt.title("Classes Distribution")
@@ -99,6 +98,7 @@ plt.show()
 ```
 <img src="/docs/class_distribution.png" alt="Classes Distribution" width="400"/>
 
+----
 
 <a name='FE'/>
 
@@ -123,7 +123,7 @@ print("Reduced number of features:", features_sparse_tsvd.shape[1])
 print("Total Variance", tsvd.explained_variance_ratio_.sum())
 ```
 
-Output:
+**Output:**
 
 ```
 Original number of features: 206
@@ -136,7 +136,8 @@ similar children across different classes i.e:- Some children might have similar
 features/attributes even though they might be tagged under a different class. So
 in order to identify that pattern, I've included `classes` in the features. 
 
- 
+----
+
 <a name='DE'/>
 
 #### Clustering - Dendrogram (find no of clusters):
@@ -156,10 +157,10 @@ On the next level, you might have children who have more complicated disease. So
 2 children are closer to the other group, then doctor's could proactively identify these
 2 children and stop them from becoming worse.  
 - From the dataset perspective, the dataset is small and hence agglomerative clustering
-works perfectly and also plotting the dendogram can easily help us identify similar
+works perfectly and also plotting the dendrogram can easily help us identify similar
 groups within the dataset.
 
-But before starting to create the dendogram, we'd have to find out the `linkage` 
+But before starting to create the dendrogram, we'd have to find out the `linkage` 
 type and `distance` metrics. 
 
 Considering the possible choices of linkage and distance metrics, 
@@ -195,7 +196,7 @@ results = pd.DataFrame(data=data, columns=['ARI',
 index=['single', 'complete', 'average', 'weighted', 'centroid', 'median', 'ward'])
 print(results)
 ```
-Output:
+**Output:**
 ```
               ARI  Completeness  Silhouette
 single    0.208778      0.634543   -0.042088
@@ -211,7 +212,7 @@ So the combination of `Euclidean` and `Ward` provides the best `Adjusted Rand In
 clusters), `Silhouette score`. 
 
 
-Then we can plot the dendogram and visualize the agglomerative clustering of the data. 
+Then we can plot the dendrogram and visualize the agglomerative clustering of the data. 
 
 ```
 plt.figure(figsize=(15, 15))
@@ -220,10 +221,10 @@ dend = shc.dendrogram(shc.linkage(features_sparse_tsvd, method='ward'),orientati
 plt.tick_params(axis="x", labelsize=10,rotation='auto')
 ```
 
-<img src="/docs/dendogram.png" alt="Dendogram" width="400"/>
+<img src="/docs/dendogram.png" alt="Dendrogram" width="400"/>
 
 
-From the dendogram, we can see that the optimal number of clusters are 4. 
+From the dendrogram, we can see that the optimal number of clusters are 4. 
 
 The agglomerative clustering is done as below:
 
@@ -231,6 +232,8 @@ The agglomerative clustering is done as below:
 cluster = AgglomerativeClustering(n_clusters=4, affinity='euclidean', linkage='ward')
 cluster_pred = cluster.fit_predict(features_sparse_tsvd)
 ```
+
+----
 
 <a name='TSNE'/>
 
@@ -265,16 +268,17 @@ for line in range(0,features_sparse_tsvd_df.shape[0]):
               size='large', color='black')
 ```
 
-Output:
+**Output:**
 
 <img src="/docs/clusters.png" alt="Clusters" width="400"/>
 
+----
 
 <a name='CC'/>
 
 #### Cluster characteristics
 
-Average Cluster Age: 
+**Average/Median Cluster Age**: 
 
 ```Average age per cluster
  Cluster
@@ -362,7 +366,7 @@ Cluster 3: Indicating need for urination, carrying out urination appropriately
 
 
 
-Note: The self care activities were identifed from the below table.
+**Note:** The self care activities were identifed from the below table.
 
 <img src="/docs/categories.png" alt="categories" width="400"/>
 
@@ -372,6 +376,8 @@ We could immediately identify that there are overlapping features between differ
 which could indicate their distance / similarity between children. Again using a hierarchical
 clustering affirms the fact that a child who possesses similar features can be easily identified 
 and isolated amongst a subgroup. 
+
+----
 
 <a name='CLASS'/>
 
@@ -399,13 +405,15 @@ clf.fit(X_train,y_train)
 y_pred=clf.predict(X_test)
 ```
 
+----
+
 <a name='EVAL'/>
 
 #### Evaluation of Model
 
 ```Overall Accuracy: 85%```
 
-Evaluation metrics: 
+**Evaluation metrics:** 
 
 <img src="/docs/metrics_classifier.png" alt="Classifier Metrics" width="400"/>
 
@@ -418,3 +426,37 @@ Class 0 has lowest `precision` of `0.75` and class 1 has lowest `recall` of `0.6
 Since the classes are balanced to some extent, the average accuracy to be considered 
 can be either `micro` or `macro` and both are approximately `0.93` and `0.96` respectively.  
 
+<a name='SCALE'/>
+
+----
+
+#### Scaling the model
+
+In order to replicate the model in a production environment, few things have to be considered.
+The entire process has to be split into 2 parts - Algorithm/Model related activities vs 
+Non Algorithm/Model related. This gives the flexibility to update or modify the pipeline 
+based on the type and need.
+
+ <img src="/docs/scaling.png" alt="Scaling" width="600"/>
+
+
+
+```
+The non-algorithm part includes exploratory graphs, processing data, dendrogram, clusters and 
+plotting evaluation metrics. These are essentially the by-products of the algorithm part.
+
+The algorithm/model part does the heavy work including feature reduction, creating clusters,
+split data, create and optimize models and saving models. 
+```
+
+All of these above methods has been implemented in the `main.py` file inside the `code` folder 
+[here](code/main.py). 
+
+```class ClusterClassify:``` handles the algorithmic side of the process while 
+```class ModelPlots``` handles the non-algorithmic aspect.  
+
+
+**Conclusion:** 
+
+Considering the small sample size, the model performs relatively efficient for all 
+target classes. 
